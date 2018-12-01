@@ -11,16 +11,16 @@ class Day1Part2 {
         val inputPath = javaClass.classLoader.getResource("input").path
         val frequencies = File(inputPath).readLines()
                 .map { f -> f.toInt() }
-        val resultingFrequency = process(frequencies)
+        val resultingFrequency = findFrequencyReachedTwice(frequencies)
         println(resultingFrequency)
     }
 
-    fun process(frequencies: List<Int>): Int {
+    fun findFrequencyReachedTwice(frequencies: List<Int>): Int {
         var sums: List<Int> = ArrayList()
-        var sum: Int = 0
+        var sum = 0
         sums = sums.plus(sum)
-        var ret: Int = 0
-        for (frequency in this.cycle(frequencies).iterator()) {
+        var ret = 0
+        for (frequency in cycle(frequencies).iterator()) {
             sum += frequency
             if (sums.contains(sum)) {
                 ret = sum
@@ -31,8 +31,8 @@ class Day1Part2 {
         return ret
     }
 
-    fun cycle(xs: List<Int>): Sequence<Int> {
+    private fun cycle(xs: List<Int>): Sequence<Int> {
         var i = 0
-        return generateSequence { xs.get(i++ % xs.size) }
+        return generateSequence { xs[i++ % xs.size] }
     }
 }
