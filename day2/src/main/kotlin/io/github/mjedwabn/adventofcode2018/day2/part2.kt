@@ -37,9 +37,8 @@ class Day2Part2 {
     private fun otherLettersAreSame(box1: String, box2: String, pos: Int) =
             box1.removeRange(pos, pos + 1) == box2.removeRange(pos, pos + 1)
 
-    private fun generatePairs(boxIDs: List<String>): Sequence<Pair<String, String>> {
-        return boxIDs.asSequence()
-                .flatMap { box1 -> boxIDs.asSequence().map { box2 -> Pair(box1, box2) } }
-                .filter { pair -> pair.first != pair.second }
-    }
+    private fun generatePairs(boxIDs: List<String>): Sequence<Pair<String, String>> =
+            boxIDs.asSequence()
+                    .flatMap { box1 -> boxIDs.asSequence().map { box2 -> Pair(box1, box2) } }
+                    .filter { pair -> pair.first != pair.second }
 }
