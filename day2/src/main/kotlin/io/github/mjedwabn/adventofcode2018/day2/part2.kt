@@ -14,30 +14,28 @@ class Day2Part2 {
         println(commonLettersBetweenTwoCorrectBoxIDs(boxIds))
     }
 
-    fun commonLettersBetweenTwoCorrectBoxIDs(boxIDs: List<String>): String {
-        val pairs = generatePairs(boxIDs)
-        for (pair in pairs) {
-            if (boxesAreCorrect(pair.first, pair.second))
-                return commonLetters(pair.first, pair.second)
-        }
-        return ":("
-    }
+    fun commonLettersBetweenTwoCorrectBoxIDs(boxIDs: List<String>): String =
+            generatePairs(boxIDs)
+                    .filter { boxesAreCorrect(it.first, it.second) }
+                    .map { commonLetters(it.first, it.second) }
+                    .first()
 
-    private fun boxesAreCorrect(box1: String, box2: String): Boolean {
-        for (i in 0..(box1.length - 1)) {
-            if (box1[i] != box2[i] && box1.removeRange(i, i + 1) == box2.removeRange(i, i + 1))
-                return true
-        }
-        return false
-    }
+    private fun boxesAreCorrect(box1: String, box2: String): Boolean =
+            box1.indices.any { boxesAreCorrectAtPosition(box1, box2, it) }
 
-    private fun commonLetters(box1: String, box2: String): String {
-        for (i in 0..(box1.length - 1)) {
-            if (box1[i] != box2[i] && box1.removeRange(i, i + 1) == box2.removeRange(i, i + 1))
-                return box1.removeRange(i, i + 1)
-        }
-        return box1
-    }
+    private fun commonLetters(box1: String, box2: String): String = box1.indices
+            .filter { boxesAreCorrectAtPosition(box1, box2, it) }
+            .map { box1.removeRange(it, it + 1) }
+            .first()
+
+    private fun boxesAreCorrectAtPosition(box1: String, box2: String, pos: Int) =
+            differAtPosition(box1, box2, pos) && otherLettersAreSame(box1, box2, pos)
+
+    private fun differAtPosition(box1: String, box2: String, pos: Int) =
+            box1[pos] != box2[pos]
+
+    private fun otherLettersAreSame(box1: String, box2: String, pos: Int) =
+            box1.removeRange(pos, pos + 1) == box2.removeRange(pos, pos + 1)
 
     private fun generatePairs(boxIDs: List<String>): Sequence<Pair<String, String>> {
         return boxIDs.asSequence()
