@@ -54,24 +54,26 @@ internal class Fabric {
 
     internal fun addClaim(claim: EuclideanClaim) {
         claims += claim
-        claim.getSquares().forEach { sq -> addCoverage(sq) }
+        claim.getSquares().forEach { addCoverage(it) }
     }
 
     private fun addCoverage(square: Coordinate) {
-        squareCoverage.compute(square) { _, coverage -> if (coverage == null) 1 else coverage + 1 }
+        squareCoverage.compute(square) { _, coverage ->
+            if (coverage == null) 1 else coverage + 1
+        }
     }
 
-    internal fun getOverlappedSquaresCount(): Int {
-        return squareCoverage.filter { s -> s.value > 1 }.size
-    }
+    internal fun getOverlappedSquaresCount(): Int =
+            squareCoverage.filter { s -> s.value > 1 }.size
 
-    internal fun findClaimThatDoesNotOverlap(): Int? {
-        return claims.filter { c -> !overlaps(c) }.map { c -> c.id }.first()
-    }
+    internal fun findClaimThatDoesNotOverlap(): Int? =
+            claims.filter { c -> !overlaps(c) }.map { c -> c.id }.first()
 
-    private fun overlaps(claim: EuclideanClaim): Boolean {
-        return claim.getSquares().any { sq -> squareCoverage.getOrDefault(sq, 0) > 1 }
-    }
+    private fun overlaps(claim: EuclideanClaim): Boolean =
+            claim.getSquares().any { squareIsOverlapped(it) }
+
+    private fun squareIsOverlapped(square: Coordinate) =
+            squareCoverage.getOrDefault(square, 0) > 1
 }
 
 internal data class Claim(val id: Int,
