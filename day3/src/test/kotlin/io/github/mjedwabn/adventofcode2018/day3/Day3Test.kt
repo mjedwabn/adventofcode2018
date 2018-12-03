@@ -45,4 +45,3 @@ internal class Day3Test {
                 Claim(2, 1, 4, 3, 3))))
     }
 }
-
