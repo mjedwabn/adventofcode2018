@@ -7,11 +7,11 @@ fun main(args: Array<String>) {
 }
 
 internal class Day3 {
-    fun run(): Int {
+    internal fun run(): Int {
         return countOverlappedSquareInchesOfFabric(ClaimParser().parseInput())
     }
 
-    fun countOverlappedSquareInchesOfFabric(claims: List<Claim>): Int {
+    internal fun countOverlappedSquareInchesOfFabric(claims: List<Claim>): Int {
         val fabric = Fabric()
         claims.map { EuclideanClaim(it) }.forEach { claim -> fabric.addClaim(claim) }
         return fabric.getOverlappedSquaresCount()
@@ -21,7 +21,7 @@ internal class Day3 {
 internal class ClaimParser {
     private val inputRegex: Regex = """#(\d+) @ (\d+),(\d+): (\d+)x(\d+)""".toRegex()
 
-    fun parseInput(): List<Claim> {
+    internal fun parseInput(): List<Claim> {
         val inputPath = javaClass.classLoader.getResource("input").path
         return File(inputPath).readLines().map { parseClaim(it) }
     }
@@ -34,7 +34,7 @@ internal class ClaimParser {
 }
 
 internal class EuclideanClaim(private val claim: Claim) {
-    fun getSquares(): Sequence<Coordinate> {
+    internal fun getSquares(): Sequence<Coordinate> {
         return (coord1.x..coord2.x).asSequence()
                 .flatMap { x -> (coord1.y..coord2.y).asSequence()
                         .map { y -> Coordinate(x, y) } }
@@ -43,7 +43,7 @@ internal class EuclideanClaim(private val claim: Claim) {
     private val coord1 get() = Coordinate(claim.leftMargin, claim.topMargin)
     private val coord2 get() = Coordinate(claim.width + claim.leftMargin - 1, claim.height + claim.topMargin - 1)
 
-    val id get() = claim.id
+    internal val id get() = claim.id
 }
 
 internal data class Coordinate(val x: Int, val y: Int)
@@ -52,7 +52,7 @@ internal class Fabric {
     private val squareCoverage: MutableMap<Coordinate, Int> = mutableMapOf()
     private val claims: MutableList<EuclideanClaim> = mutableListOf()
 
-    fun addClaim(claim: EuclideanClaim) {
+    internal fun addClaim(claim: EuclideanClaim) {
         claims += claim
         claim.getSquares().forEach { sq -> addCoverage(sq) }
     }
@@ -61,11 +61,11 @@ internal class Fabric {
         squareCoverage.compute(square) { _, coverage -> if (coverage == null) 1 else coverage + 1 }
     }
 
-    fun getOverlappedSquaresCount(): Int {
+    internal fun getOverlappedSquaresCount(): Int {
         return squareCoverage.filter { s -> s.value > 1 }.size
     }
 
-    fun findClaimThatDoesNotOverlap(): Int? {
+    internal fun findClaimThatDoesNotOverlap(): Int? {
         return claims.filter { c -> !overlaps(c) }.map { c -> c.id }.first()
     }
 
@@ -74,6 +74,6 @@ internal class Fabric {
     }
 }
 
-data class Claim(val id: Int,
+internal data class Claim(val id: Int,
                           val leftMargin: Int, val topMargin: Int,
                           val width: Int, val height: Int)
