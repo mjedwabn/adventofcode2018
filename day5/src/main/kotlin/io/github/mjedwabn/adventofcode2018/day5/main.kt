@@ -8,18 +8,15 @@ fun main(args: Array<String>) {
 }
 
 internal class Day5 {
-    fun run(): Int {
-        return getRemainingUnits(parseInput())
-    }
+    fun run(): Int = getRemainingUnits(parseInput())
 
     private fun parseInput(): String {
         val inputPath = javaClass.classLoader.getResource("input").path
         return File(inputPath).readLines()[0]
     }
 
-    fun getRemainingUnits(polymer: String): Int {
-        return Reactor().react(polymer).length
-    }
+    fun getRemainingUnits(polymer: String): Int =
+            Reactor().react(polymer).length
 }
 
 internal class Reactor {

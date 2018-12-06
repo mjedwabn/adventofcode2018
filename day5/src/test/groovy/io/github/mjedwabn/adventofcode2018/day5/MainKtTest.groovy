@@ -6,7 +6,7 @@ import spock.lang.Specification
 class MainKtTest extends Specification {
     def "sample reactions"() {
         expect:
-        new Day5().react(polymer) == reacted
+        new Reactor().react(polymer) == reacted
 
         where:
         polymer            || reacted
