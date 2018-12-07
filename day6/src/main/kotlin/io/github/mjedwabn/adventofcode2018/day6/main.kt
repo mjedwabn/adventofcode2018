@@ -48,6 +48,7 @@ internal class Board(private val coordinates: List<Coordinate>) {
         height = boundary.bottom - boundary.top + 1
         array = Array(height) { IntArray(width) }
         coordinates.forEach { addCoordinate(it) }
+        initLocations()
     }
 
     private fun getBoundary(coordinates: List<Coordinate>): Boundary {
@@ -83,7 +84,6 @@ internal class Board(private val coordinates: List<Coordinate>) {
     }
 
     fun fill() {
-        initLocations()
         fillAreas()
     }
 
@@ -156,6 +156,16 @@ internal class Board(private val coordinates: List<Coordinate>) {
         val location = array[y][x]
         if (location == 0)
             array[y][x] = Int.MAX_VALUE
+    }
+
+    fun getSizeOfRegion(distance: Int): Int {
+        return (0..(height - 1)).flatMap { y -> (0..(width - 1)).map { x -> calculateTotalDistance(x, y) } }
+                .filter { it < distance }
+                .size
+    }
+
+    private fun calculateTotalDistance(x: Int, y: Int): Int {
+        return coordinates.map { distance(it, x, y) }.sum()
     }
 }
 
