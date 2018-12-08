@@ -2,7 +2,6 @@ package io.github.mjedwabn.adventofcode2018.day8
 
 import spock.lang.Specification
 
-
 class Day8Test extends Specification {
     def "sample tree"() {
         expect:
@@ -15,6 +14,6 @@ class Day8Test extends Specification {
     }
 
     int metaSum(List<Integer> treeInput) {
-        return new Day8().getMetaDataEntriesSum(treeInput)
+        new Day8().getMetaDataEntriesSum(treeInput)
     }
 }

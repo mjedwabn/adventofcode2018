@@ -2,34 +2,30 @@ package io.github.mjedwabn.adventofcode2018.day8
 
 import java.io.File
 
-
 fun main(args: Array<String>) {
     println(Day8().run())
 }
 
 internal class Day8 {
-    fun run(): Int {
+    fun run(): Int = getMetaDataEntriesSum(parseInput())
+
+    private fun parseInput(): List<Int> {
         val inputPath = javaClass.classLoader.getResource("input").path
-        val treeInput = File(inputPath).readLines()
+        return File(inputPath).readLines()
                 .first().split(' ')
                 .map { it.toInt() }
-        return getMetaDataEntriesSum(treeInput)
     }
 
-    fun getMetaDataEntriesSum(treeInput: List<Int>): Int {
-        val root: Node = TreeBuilder(treeInput).build()
-        return getMetaDataEntriesSum(root)
-    }
+    fun getMetaDataEntriesSum(treeInput: List<Int>): Int =
+            getMetaDataEntriesSum(TreeBuilder(treeInput).build())
 
-    private fun getMetaDataEntriesSum(node: Node): Int {
-        return node.metadataEntries.sum() + node.children.map { getMetaDataEntriesSum(it) }.sum()
-    }
+    private fun getMetaDataEntriesSum(node: Node): Int =
+            node.metadataEntries.sum() +
+                    node.children.map { getMetaDataEntriesSum(it) }.sum()
 }
 
 internal class TreeBuilder(private val treeInput: List<Int>) {
-    fun build(): Node {
-        return buildNode(treeInput.listIterator())
-    }
+    fun build(): Node = buildNode(treeInput.listIterator())
 
     private fun buildNode(inputPointer: ListIterator<Int>): Node {
         val header = Header(inputPointer.next(), inputPointer.next())
