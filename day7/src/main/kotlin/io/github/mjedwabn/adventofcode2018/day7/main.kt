@@ -7,40 +7,46 @@ fun main(args: Array<String>) {
 }
 
 internal class Day7 {
-    private val steps: MutableMap<String, Step> = mutableMapOf()
     fun run(): String {
-        return getStepsOrder(InputParser().parse())
+        return Graph(0, 1).processAndMeasure(InputParser().parse()).first
     }
+}
 
-    fun getStepsOrder(instructions: Collection<Instruction>): String {
+internal class Graph(private val baseTime: Int, private val workers: Int) {
+    private val steps: MutableMap<String, Step> = mutableMapOf()
+    private var timer = 0
+
+    fun processAndMeasure(instructions: Collection<Instruction>): Pair<String, Int> {
         instructions.forEach { addToGraph(it) }
         var stepsOrder = ""
         do {
             stepsOrder += doNextStep()
-        } while(stepsLeftToDo())
-        return stepsOrder
-    }
-
-    private fun stepsLeftToDo(): Boolean {
-        return !findAvailableSteps().isEmpty()
-    }
-
-    private fun doNextStep(): String {
-        val step = findAvailableSteps().first()
-        step.process()
-        return step.name
-    }
-
-    private fun findAvailableSteps(): List<Step> {
-        return steps.values.filter { it.isAvailable }.sortedBy { it.name }
+            ++timer
+        } while (workLeftToDo())
+        return Pair(stepsOrder, timer)
     }
 
     private fun addToGraph(instruction: Instruction) {
-        val predecessor = steps.getOrPut(instruction.predecessor) { Step(instruction.predecessor) }
-        val successor = steps.getOrPut(instruction.successor) { Step(instruction.successor) }
+        val predecessor = steps.getOrPut(instruction.predecessor) { Step(instruction.predecessor.first(), baseTime) }
+        val successor = steps.getOrPut(instruction.successor) { Step(instruction.successor.first(), baseTime) }
 
         predecessor.addSuccessor(successor)
         successor.addPredecessor(predecessor)
+    }
+
+    private fun findAvailableSteps(): List<Step> {
+        return (steps.values.filter { it.processing }.sortedBy { it.name } +
+                steps.values.filter { it.isAvailable }.sortedBy { it.name }).distinct()
+    }
+
+    private fun workLeftToDo(): Boolean {
+        return steps.map { it.value.timeLeft }.sum() > 0
+    }
+
+    private fun doNextStep(): String {
+        val steps = findAvailableSteps().take(workers)
+        steps.forEach { it.process() }
+        return steps.filter { !it.processing }.map { it.name }.joinToString()
     }
 }
 
@@ -60,13 +66,15 @@ class InputParser {
     }
 }
 
-
-internal class Step(val name: String) {
+internal class Step(val name: Char, private val baseTime: Int) {
     private val successors: MutableList<Step> = mutableListOf()
     private val predecessors: MutableList<Step> = mutableListOf()
     private var available = true
     private var processed = false
     val isAvailable get() = available
+    private val time get() = baseTime + name.toInt() - 64
+    var processing = false
+    var timeLeft = time
 
     fun addSuccessor(successor: Step) {
         successor.available = false
@@ -74,9 +82,14 @@ internal class Step(val name: String) {
     }
 
     fun process() {
-        processed = true
-        available = false
-        unlockSuccessorsIfPossible()
+        --timeLeft
+        processing = true
+        if (timeLeft == 0) {
+            processed = true
+            available = false
+            processing = false
+            unlockSuccessorsIfPossible()
+        }
     }
 
     private fun unlockSuccessorsIfPossible() {

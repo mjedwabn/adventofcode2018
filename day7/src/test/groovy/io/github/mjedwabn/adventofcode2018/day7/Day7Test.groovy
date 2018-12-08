@@ -15,8 +15,8 @@ class Day7Test extends Specification {
     }
 
     String order(List<List<String>> instructions) {
-        return new Day7().getStepsOrder(instructions.stream()
+        return new Graph(0, 1).processAndMeasure(instructions.stream()
                 .map{i -> new Instruction(i[0], i[1])}
-                .collect())
+                .collect()).first
     }
 }
