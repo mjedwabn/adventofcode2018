@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
 class Day9 {
     private val gameParamsRegex: Regex = """(\d+) players; last marble is worth (\d+) points""".toRegex()
 
-    fun run(): Int {
+    fun run(): Long {
         val inputPath = javaClass.classLoader.getResource("input").path
         val gameParams = File(inputPath).readLines()[0]
         val matchResult = gameParamsRegex.find(gameParams)
@@ -18,7 +18,7 @@ class Day9 {
         return getHighScore(numberOfPlayers.toInt(), lastMarbleNumber.toInt())
     }
 
-    fun getHighScore(numberOfPlayers: Int, lastMarbleNumber: Int): Int {
+    fun getHighScore(numberOfPlayers: Int, lastMarbleNumber: Int): Long {
         val game = MarblesGame(numberOfPlayers, lastMarbleNumber)
         game.play()
         return game.getHighScore()
@@ -27,12 +27,12 @@ class Day9 {
 
 class MarblesGame(private val numberOfPlayers: Int, private val lastMarbleNumber: Int) {
     private val players: Iterator<Int>
-    private val playerScoreTable: MutableMap<Int, Int>
+    private val playerScoreTable: MutableMap<Int, Long>
     private val circle: Circle = Circle()
 
     init {
         players = cycle((1..numberOfPlayers).toList())
-        playerScoreTable = (1..numberOfPlayers).map { it to 0 }.toMap().toMutableMap()
+        playerScoreTable = (1..numberOfPlayers).map { it to 0L }.toMap().toMutableMap()
     }
 
     private fun cycle(list: List<Int>): Iterator<Int> {
@@ -51,27 +51,27 @@ class MarblesGame(private val numberOfPlayers: Int, private val lastMarbleNumber
         playerScoreTable.computeIfPresent(player) { _, s -> s + gained }
     }
 
-    fun getHighScore(): Int = playerScoreTable.values.sortedDescending().first()
+    fun getHighScore(): Long = playerScoreTable.values.sortedDescending().first()
 }
 
 internal class Circle {
-    private var circle: LinkedList<Int> = LinkedList(listOf(0))
+    private var circle: ArrayList<Int> = ArrayList(listOf(0))
     private var currentMarble = MarbleIterator(circle)
 
-    fun placeMarble(marble: Int): Int = when {
+    fun placeMarble(marble: Int): Long = when {
         marble % 23 == 0 -> placeScoringMarble(marble)
         else -> placeStandardMable(marble)
     }
 
-    private fun placeScoringMarble(marble: Int): Int {
-        var total = marble
+    private fun placeScoringMarble(marble: Int): Long {
+        var total: Long = marble.toLong()
         (1..7).forEach { currentMarble.moveToPrevious() }
         total += currentMarble.get()
         currentMarble.remove()
         return total
     }
 
-    private fun placeStandardMable(marble: Int): Int {
+    private fun placeStandardMable(marble: Int): Long {
         currentMarble.moveToNext()
         currentMarble.add(marble)
         currentMarble.moveToNext()
@@ -85,7 +85,7 @@ internal class Circle {
     }
 }
 
-class MarbleIterator(private val marbles: LinkedList<Int>) : MutableListIterator<Int> {
+class MarbleIterator(private val marbles: ArrayList<Int>) : MutableListIterator<Int> {
     private var index = 0
 
     override fun hasPrevious(): Boolean = true
