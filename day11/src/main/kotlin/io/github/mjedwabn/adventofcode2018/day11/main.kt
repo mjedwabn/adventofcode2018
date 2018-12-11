@@ -6,11 +6,13 @@ fun main(args: Array<String>) {
 }
 
 class WristMountedDevice(private val serialNumber: Int) {
-    private val grid = Array(300) { IntArray(300) }
+    private val gridSize = 300
+
+    private val grid = Array(gridSize) { IntArray(gridSize) }
 
     init {
-        (0 until 300).forEach { y ->
-            (0 until 300).forEach { x ->
+        (0 until gridSize).forEach { y ->
+            (0 until gridSize).forEach { x ->
                 grid[y][x] = calculatePowerLevel(x + 1, y + 1)
             }
         }
@@ -26,31 +28,40 @@ class WristMountedDevice(private val serialNumber: Int) {
         return powerLevel
     }
 
-    private fun getHundredsDigit(number: Int): Int {
-        return (number / 100) % 10
-    }
+    private fun getHundredsDigit(number: Int): Int = (number / 100) % 10
 
-    fun getPowerLevelOfCell(x: Int, y: Int): Int {
-        return grid[y - 1][x - 1]
-    }
+    fun getPowerLevelOfCell(x: Int, y: Int): Int = grid[y - 1][x - 1]
 
     fun getLargestTotalPowerCell(): Pair<Int, Int> {
-        val (x1, y1, _) = (0 until 300 - 2).flatMap { y ->
-            (0 until 300 - 2).map { x ->
-                calculateTotalPowerLevel(x, y)
-            }
-        }
-                .sortedByDescending { it.powerLevel }
-                .first()
+        val (x1, y1, _) = getLargestPowerLevelCoordinates(3)
         return Pair(x1 + 1, y1 + 1)
     }
 
-    private fun calculateTotalPowerLevel(startX: Int, startY: Int): TotalPowerLevelCoordinates {
-        val totalPowerLevel = (startY until startY + 3).flatMap { y ->
-            (startX until startX + 3).map { x -> grid[y][x] }
+    private fun getLargestPowerLevelCoordinates(size: Int): LargestPowerLevelCoordinates {
+        println("size $size")
+        return (0..(gridSize - size)).flatMap { y ->
+            (0..(gridSize - size)).map { x ->
+                calculateTotalPowerLevel(x, y, size)
+            }
+        }.sortedByDescending { it.powerLevel }.first()
+    }
+
+    private fun calculateTotalPowerLevel(startX: Int, startY: Int, size: Int): LargestPowerLevelCoordinates {
+        val totalPowerLevel = (startY until startY + size).flatMap { y ->
+            (startX until startX + size).map { x -> grid[y][x] }
         }.sum()
-        return TotalPowerLevelCoordinates(startX, startY, totalPowerLevel)
+        return LargestPowerLevelCoordinates(startX, startY, size, totalPowerLevel)
+    }
+
+    fun getLargestTotalSquareIdentifier(): SquareIdentifier {
+        val (x, y, size, _) = (1..gridSize).toList().parallelStream()
+                .map { getLargestPowerLevelCoordinates(it) }
+                .sorted { o1, o2 -> o2.powerLevel - o1.powerLevel }
+                .findFirst().orElse(LargestPowerLevelCoordinates(0, 0, 0, 0))
+        return SquareIdentifier(x + 1, y + 1, size)
     }
 }
 
-data class TotalPowerLevelCoordinates(val x: Int, val y: Int, val powerLevel: Int)
+data class LargestPowerLevelCoordinates(val x: Int, val y: Int, val size: Int, val powerLevel: Int)
+
+data class SquareIdentifier(val x: Int, val y: Int, val size: Int)

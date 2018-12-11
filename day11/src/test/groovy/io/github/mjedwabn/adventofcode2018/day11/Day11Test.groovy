@@ -36,3 +36,15 @@ class Day11Test extends Specification {
         42           || 21 | 61
     }
 }
+
+
+class PartTwo extends Specification {
+    def "sample largest total square"() {
+        expect:
+        new WristMountedDevice(serialNumber).getLargestTotalSquareIdentifier() == new SquareIdentifier(x, y, size)
+
+        where:
+        serialNumber || x  | y   | size
+        18           || 90 | 269 | 16
+    }
+}
