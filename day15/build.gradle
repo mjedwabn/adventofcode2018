@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+group 'io.github.mjedwabn.adventofcode2018'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
+dependencies {
+    testCompile "org.codehaus.groovy:groovy-all:2.5.4"
+    testCompile "org.spockframework:spock-core:1.2-groovy-2.5"
+}
+
+sourceCompatibility = 11
